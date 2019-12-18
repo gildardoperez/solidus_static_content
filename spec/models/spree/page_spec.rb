@@ -9,11 +9,6 @@ describe Spree::Page do
     end
   end
 
-  it 'always add / prefix to slug' do
-    page = create(:page, slug: 'hello')
-    expect(page.slug).to eq '/hello'
-  end
-
   context '.link' do
     it 'return slug if foreign_link blank' do
       page = create(:page, slug: 'hello')
@@ -26,9 +21,7 @@ describe Spree::Page do
     end
   end
 
-
   context "pages in stores" do
-
     before(:each) do
       @store = create(:store)
       @page = create(:page, :stores => [@store])
@@ -40,7 +33,29 @@ describe Spree::Page do
       expect(pages_by_store).to include(@page)
       expect(pages_by_store).to_not include(@page2)
     end
-
   end
 
+  describe '#slug' do
+    it 'always adds a "/" (slash) prefix to the slug' do
+      page = create(:page, slug: 'hello')
+      expect(page.slug).to eq '/hello'
+    end
+
+    context 'when a title is present' do
+      it 'is generated from the title' do
+        page = create(:page, slug: nil, title: 'Hello World!')
+
+        expect(page).to be_valid
+        expect(page.slug).to eq('/hello-world')
+      end
+    end
+  end
+
+  describe '.meta_title' do
+    it 'falls back to title' do
+      page = build(:page, title: "Foo Bar", meta_title: nil)
+
+      expect(page.meta_title).to eq("Foo Bar")
+    end
+  end
 end
